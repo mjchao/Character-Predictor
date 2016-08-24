@@ -3,6 +3,7 @@ Created on Aug 23, 2016
 
 @author: mjchao
 '''
+import dictionary
 
 
 class Optimizers(object):
@@ -12,12 +13,16 @@ class Optimizers(object):
 
 
 class TrainConfig(object):
-    """Parameters for training algorithm.
+    """Parameters for the training algorithm.
     """
 
-    def __init__(self, learning_rate=0.001, optimizer=Optimizers.SGD,
+    def __init__(self, data_file="data/corpus1.txt",
+                 char_to_id_dictionary=dictionary.CharToIdDictionary(),
+                 learning_rate=0.001, optimizer=Optimizers.SGD,
                  train_iters=100000, chars_per_sample=16, batch_size=128,
                  checkpoint_frequency=1000):
+        self.data_file = data_file
+        self.char_to_id_dictionary = char_to_id_dictionary
         self.learning_rate = learning_rate
         self.optimizer = optimizer
         self.train_iters = train_iters
@@ -30,6 +35,7 @@ def DefaultConfig():
     """Creates a default training configuration:
 
         Default configurations:
+            data file: data/corpus1.txt
             learning rate: 0.001
             optimizer: stochastic gradient descent
             train iterations: 100000
