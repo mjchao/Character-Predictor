@@ -9,7 +9,7 @@ import dictionary
 class Optimizers(object):
     """Enum for various optimizers that can be used in training.
     """
-    SGD = range(1)
+    SGD, ADAM = range(2)
 
 
 class TrainConfig(object):
@@ -20,6 +20,7 @@ class TrainConfig(object):
                  char_to_id_dictionary=dictionary.CharToIdDictionary(),
                  learning_rate=0.001, optimizer=Optimizers.SGD,
                  train_iters=100000, chars_per_sample=16, batch_size=128,
+                 num_hidden_units=128, forget_bias=1.0,
                  checkpoint_frequency=1000):
         self.data_file = data_file
         self.char_to_id_dictionary = char_to_id_dictionary
@@ -28,6 +29,8 @@ class TrainConfig(object):
         self.train_iters = train_iters
         self.chars_per_sample = chars_per_sample
         self.batch_size = batch_size
+        self.num_hidden_units = num_hidden_units
+        self.forget_bias = forget_bias
         self.checkpoint_frequency = checkpoint_frequency
 
 
@@ -41,6 +44,8 @@ def DefaultConfig():
             train iterations: 100000
             characters per sample: 16
             batch size: 128
+            number of hidden units: 128
+            forget bias: 1.0
             checkpoint frequency: once per 1000 iterations
 
     Returns:
