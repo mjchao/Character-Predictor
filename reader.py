@@ -26,44 +26,101 @@ class TrainingDataReader(object):
         self._sample_size = sample_size
         self._batch_size = batch_size
 
-        # Variables to keep track of where we are in the file
         self._reader = open(self._filename)
         self._epoch = 0
 
-    def GetSample(self):
-        """Gets the next sample.
-        
+        # The buffer is an array-based queue that serves as a sliding window
+        # over the training data file. Every time we get a sample, we slide the
+        # window forward by 1 character.
+        self._buffer = []
+        self._buffer_start_idx = 0
+        self._label = ""
+        self._resetting_epoch = False
+        self._ResetEpoch()
+
+
+    def ConsumeChars(self, num_chars):
+        """Consumes characters from the training data file.
+
+        Args:
+            num_chars: (int) The number of characters to consume
+
         Returns:
-            sample: (numpy array) An array of size (sample_size,) that is the
-                sequence of characters in the training sample.
+            (list) A list of length num_chars that are the characters consumed.
+            Or None if the buffer was reset due to changing epoch.
         """
-        rtn = np.zeros((self._sample_size,), dtype=np.int32)
+        chars_to_read = num_chars
+        consumed_chars = []
         fill_from_idx = 0
-        chars_to_read = self._sample_size
         while chars_to_read > 0:
             chars_for_filling = list(self._reader.read(chars_to_read))
             chars_read = len(chars_for_filling)
+
+            # Prevent infinite loop on empty files
+            if chars_read == 0 and chars_to_read == self._sample_size:
+                raise RuntimeError("Input file is empty.")
+
             chars_to_read -= chars_read
-            rtn[fill_from_idx:fill_from_idx + chars_read] = [
-                self._dictionary.GetId(c) for c in chars_for_filling]
+            consumed_chars += chars_for_filling
             fill_from_idx += chars_read
 
             # If the file didn't have enough to fill the batch, we need
             # to start a new epoch.
             if chars_to_read > 0:
                 self._epoch += 1
-                self._reader = open(self._filename)
+                self._ResetEpoch()
+                return None
 
-        return rtn
+        return consumed_chars
+
+    def _ResetEpoch(self):
+        if self._resetting_epoch:
+            raise RuntimeError("File is too small to fill a batch.")
+        self._resetting_epoch = True
+        self._reader = open(self._filename)
+        new_chars = self.ConsumeChars(self._sample_size + 1)
+        self._buffer = [self._dictionary.GetId(c) for c in
+                        new_chars[:-1]]
+        self._buffer_start_idx = 0
+        self._label = self._dictionary.GetId(new_chars[-1])
+        self._resetting_epoch = False
+
+    def GetSample(self):
+        """Gets the next sample.
+
+        Returns:
+            sequence: (numpy array) An array of size (sample_size,) that is the
+                sequence of characters in the training sample.
+            label: (int) The character that should come next in the sequence.
+        """
+        sequence = np.array(self._buffer[self._buffer_start_idx:] +
+                            self._buffer[:self._buffer_start_idx])
+        label = self._label
+
+        # Move the sliding window buffer forward by 1 character.
+        self._buffer[self._buffer_start_idx] = label
+        self._buffer_start_idx += 1
+        self._buffer_start_idx %= self._sample_size
+
+
+        next_label = self.ConsumeChars(1)
+        # If we reset due to changing epoch, we don't have to do anything.
+        # The ResetEpoch() method will take care of everything.
+        if next_label is not None:
+            self._label = self._dictionary.GetId(next_label[0])
+        return sequence, label
 
     def GetBatch(self):
         """Gets the next batch of training examples.
-        
+
         Returns:
-            batch: (numpy array) A numpy array of size (batch_size, sample_size)
-                that is the next batch of training data.
+            sequences: (numpy array) A numpy array of shape
+                (batch_size, sample_size) that is the next batch of training
+                data sequences.
+            labels: (numpy array) A numpy array of shape (batch_size) that are
+                the labels for the next batch of training data sequences.
         """
-        return np.array([self.GetSample() for _ in range(self._batch_size)])
+        return [self.GetSample() for _ in range(self._batch_size)]
 
     def GetEpoch(self):
         """Gets the current epoch.
