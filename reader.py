@@ -120,7 +120,13 @@ class TrainingDataReader(object):
             labels: (numpy array) A numpy array of shape (batch_size) that are
                 the labels for the next batch of training data sequences.
         """
-        return [self.GetSample() for _ in range(self._batch_size)]
+        sequences = []
+        labels = []
+        for _ in range(self._batch_size):
+            sequence, label = self.GetSample()
+            sequences.append(sequence)
+            labels.append(label)
+        return sequences, labels
 
     def GetEpoch(self):
         """Gets the current epoch.

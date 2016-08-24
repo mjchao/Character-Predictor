@@ -85,7 +85,8 @@ class ReaderTest(unittest.TestCase):
         char_to_id_dict = self._CreateTestDictionary()
         test_reader = self._CreateTestReader(char_to_id_dict,
                                              ReaderTest._TEST_DATA_PATH, 7, 7)
-        found = test_reader.GetBatch()
+        sequences, labels = test_reader.GetBatch()
+        found = zip(sequences, labels)
         expected_sequences = [" a b c ", "a b c 1", " b c 1 ", " a b c ",
                               "a b c 1", " b c 1 ", " a b c "]
         expected_labels = ["1", " ", "2", "1", " ", "2", "1"]
