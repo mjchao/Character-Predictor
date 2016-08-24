@@ -4,13 +4,15 @@ Created on Aug 23, 2016
 @author: mjchao
 '''
 import unittest
-
+import os
 import numpy as np
 import dictionary
 import reader
 
 
 class ReaderTest(unittest.TestCase):
+
+    _TEST_DATA_PATH = os.path.join("test_data", "test_corpus_tiny.txt")
 
     def _CreateTestDictionary(self):
         return dictionary.CharToIdDictionary()
@@ -27,7 +29,7 @@ class ReaderTest(unittest.TestCase):
         """
         char_to_id_dict = self._CreateTestDictionary()
         test_reader = self._CreateTestReader(
-            char_to_id_dict, "test_corpus_tiny.txt", 1)
+            char_to_id_dict, ReaderTest._TEST_DATA_PATH, 1)
         expected = self._BuildExpectedBatches(
             char_to_id_dict, [" ", "a", " ", "b", " ", "c", " ", "1", " ", "2"])
         found = [test_reader.GetBatch() for _ in range(10)]
@@ -38,7 +40,7 @@ class ReaderTest(unittest.TestCase):
         """
         char_to_id_dict = self._CreateTestDictionary()
         test_reader = self._CreateTestReader(
-            char_to_id_dict, "test_corpus_tiny.txt", 3)
+            char_to_id_dict, ReaderTest._TEST_DATA_PATH, 3)
         expected_batches = [" a ", "b c", " 1 ", "2 a", " b "]
         expected = [np.array([char_to_id_dict.GetId(c) for c in batch],
                              dtype=np.int32) for batch in expected_batches]
@@ -50,7 +52,7 @@ class ReaderTest(unittest.TestCase):
         """
         char_to_id_dict = self._CreateTestDictionary()
         test_reader = self._CreateTestReader(char_to_id_dict,
-                                             "test_corpus_tiny.txt", 15)
+                                             ReaderTest._TEST_DATA_PATH, 15)
         expected_batches = [" a b c 1 2 a b ", "c 1 2 a b c 1 2",
                             " a b c 1 2 a b "]
         expected = [np.array([char_to_id_dict.GetId(c) for c in batch],
