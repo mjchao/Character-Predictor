@@ -19,3 +19,12 @@ class CharToIdDictionary(object):
             char: (char) A character to convert to an ID.
         """
         return ord(char)
+
+    def Size(self):
+        """Gets the number of characters recognized by the dictionary
+        
+        Returns:
+            size: (int) The number of characters recognized by the dictionary.
+                The integer IDs will be from 0, 1, ..., size-1.
+        """
+        return 128
