@@ -19,7 +19,7 @@ class TrainConfig(object):
     def __init__(self, data_file="data/corpus0.txt",
                  char_to_id_dictionary=dictionary.CharToIdDictionary(),
                  learning_rate=0.1, optimizer=Optimizers.ADAM,
-                 train_iters=100, chars_per_sample=64, batch_size=128,
+                 train_iters=3000, chars_per_sample=64, batch_size=128,
                  num_hidden_units=128, forget_bias=1.0,
                  checkpoint_frequency=1000):
         self.data_file = data_file

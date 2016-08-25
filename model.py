@@ -109,5 +109,7 @@ class CharacterPredictorModel(object):
                                                              avg_cost, avg_acc))
                 sys.stdout.flush()
                 if i % self._config.checkpoint_frequency == 0:
+                    total_cost = total_acc = 0.0
+                    total_iters = 0
                     sys.stdout.write("\n")
                     sys.stdout.flush()
