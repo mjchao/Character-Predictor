@@ -95,9 +95,9 @@ class CharacterPredictorModel(object):
             total_iters = 0
             for i in range(self._config.train_iters):
                 sequences, labels = self._reader.GetBatch()
-                cost, acc = self._session.run([self._cost, self._accuracy], {
-                    self._inputs: sequences,
-                    self._labels: self._ConvertToOneHot(labels)})
+                cost, acc, _ = self._session.run([self._cost, self._accuracy,
+                    self._train_op], {self._inputs: sequences, self._labels:
+                                      self._ConvertToOneHot(labels)})
 
                 total_cost += cost
                 total_acc += acc
