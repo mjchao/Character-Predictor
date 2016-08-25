@@ -20,9 +20,17 @@ class CharToIdDictionary(object):
         """
         return ord(char)
 
+    def GetChar(self, char_id):
+        """Converts the given ID to an ASCII character.
+
+        Args:
+            char_id: (int) An int to convert to a character
+        """
+        return chr(char_id)
+
     def Size(self):
         """Gets the number of characters recognized by the dictionary
-        
+
         Returns:
             size: (int) The number of characters recognized by the dictionary.
                 The integer IDs will be from 0, 1, ..., size-1.

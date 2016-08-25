@@ -12,6 +12,8 @@ def main():
     config = train_config.DefaultConfig()
     char_pred_model = model.CharacterPredictorModel(config)
     char_pred_model.Train()
+    test_str = "once upon time it was a dark and stormy night. It was up to Sher"
+    print char_pred_model.ContinueWriting(test_str, 10)
     _start_shell(locals())
 
 def _start_shell(local_ns=None):

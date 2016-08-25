@@ -6,6 +6,22 @@ Created on Aug 23, 2016
 import numpy as np
 
 
+def ConvertStringToSequence(dictionary, string):
+    """Converts a string into a sequence that the model understands.
+
+    Args:
+        dictionary: The dictionary to use to convert characters to IDs. It just
+            has to supply a GetId() function that takes a char and returns its
+            ID.
+        string: (string) The string to convert into a sequence.
+
+    Returns:
+        (list) A list of length len(string) that are the IDs of each
+            character in the string
+    """
+    return [dictionary.GetId(c) for c in list(string)]
+
+
 class TrainingDataReader(object):
     """Reads training data.
     """
