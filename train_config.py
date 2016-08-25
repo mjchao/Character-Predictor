@@ -16,7 +16,7 @@ class TrainConfig(object):
     """Parameters for the training algorithm.
     """
 
-    def __init__(self, data_file="data/corpus2.txt",
+    def __init__(self, data_file="data/corpus0.txt",
                  char_to_id_dictionary=dictionary.CharToIdDictionary(),
                  learning_rate=0.1, optimizer=Optimizers.ADAM,
                  train_iters=100000, chars_per_sample=64, batch_size=128,

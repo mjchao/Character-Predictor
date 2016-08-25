@@ -4,6 +4,7 @@ Created on Aug 23, 2016
 @author: mjchao
 '''
 import numpy as np
+import sys
 import tensorflow as tf
 import reader
 import train_config
@@ -89,12 +90,24 @@ class CharacterPredictorModel(object):
     def Train(self):
         with self._session.as_default():
             self._init.run()
+
+            total_cost = total_acc = 0.0
+            total_iters = 0
             for i in range(self._config.train_iters):
                 sequences, labels = self._reader.GetBatch()
                 cost, acc = self._session.run([self._cost, self._accuracy], {
                     self._inputs: sequences,
                     self._labels: self._ConvertToOneHot(labels)})
+
+                total_cost += cost
+                total_acc += acc
+                total_iters += 1
+                avg_cost = total_cost / total_iters
+                avg_acc = total_acc / total_iters
+                sys.stdout.write("\r Iteration %d: Average cost = %.6f, "
+                                 "Average accuracy = %.4f" %(i,
+                                                             avg_cost, avg_acc))
+                sys.stdout.flush()
                 if i % self._config.checkpoint_frequency == 0:
-                    print "Checkpoint %d: Cost = %.6f, Accuracy = %.2f" %(i,
-                                                                          cost,
-                                                                         acc)
+                    sys.stdout.write("\n")
+                    sys.stdout.flush()
