@@ -90,26 +90,14 @@ class CharacterPredictorModel(object):
     def Train(self):
         with self._session.as_default():
             self._init.run()
-
-            total_cost = total_acc = 0.0
-            total_iters = 0
             for i in range(self._config.train_iters):
                 sequences, labels = self._reader.GetBatch()
                 cost, acc, _ = self._session.run([self._cost, self._accuracy,
                     self._train_op], {self._inputs: sequences, self._labels:
                                       self._ConvertToOneHot(labels)})
-
-                total_cost += cost
-                total_acc += acc
-                total_iters += 1
-                avg_cost = total_cost / total_iters
-                avg_acc = total_acc / total_iters
-                sys.stdout.write("\r Iteration %d: Average cost = %.6f, "
-                                 "Average accuracy = %.4f" %(i,
-                                                             avg_cost, avg_acc))
+                sys.stdout.write("\r Iteration %d: Cost = %.6f, "
+                                 "Accuracy = %.4f" %(i, cost, acc))
                 sys.stdout.flush()
                 if i % self._config.checkpoint_frequency == 0:
-                    total_cost = total_acc = 0.0
-                    total_iters = 0
                     sys.stdout.write("\n")
                     sys.stdout.flush()
